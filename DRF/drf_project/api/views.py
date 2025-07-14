@@ -1,5 +1,6 @@
 # from django.shortcuts import render
 # from django.http import JsonResponse
+from curses.ascii import EM
 from employees.models import Employee
 from students.models import Student
 from .serializers import EmployeeSerializers, StudentSerializers
@@ -107,8 +108,18 @@ class Employees(
         return self.create(request)
 
 
-class EmployeesDetails(generics.GenericAPIView):
-    pass
+class EmployeesDetails(mixins.RetrieveModelMixin,mixins.UpdateModelMixin, mixins.DestroyModelMixin ,generics.GenericAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializers
+
+    def get(self, request, pk):
+        return self.retrieve(request, pk )
+
+    def put(self, request, pk):
+        return self.update(request, pk)
+
+    def delete(self, request, pk):
+        return self.destroy(request, pk)
 
 
 # ----------------------------------------- ( AI ) -------------------------------------#
