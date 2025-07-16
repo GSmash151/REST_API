@@ -1,3 +1,5 @@
+# drf/py_client/list.py
+
 import requests
 
 endpoint = "http://localhost:8000/api/products/"

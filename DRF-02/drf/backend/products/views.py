@@ -1,3 +1,5 @@
+# drf/backend/products/views.py
+
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.decorators import api_view
@@ -8,7 +10,7 @@ from .models import Product
 from .serializer import ProductSerializer
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
-  qs = Product.objects.all()
+  queryset = Product.objects.all()
   serializer_class = ProductSerializer
 
   def perform_create(self, serializer):
@@ -23,7 +25,7 @@ product_list_create_view = ProductListCreateAPIView.as_view()
 
 
 class ProductCreateAPIView(generics.CreateAPIView):
-  qs = Product.objects.all()
+  queryset = Product.objects.all()
   serializer_class = ProductSerializer
 
   def perform_create(self, serializer):
@@ -37,14 +39,14 @@ class ProductCreateAPIView(generics.CreateAPIView):
 product_create_view = ProductCreateAPIView.as_view()
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
-  qs = Product.objects.all()
+  queryset = Product.objects.all()
   serializer_class = ProductSerializer
 
 product_detail_view = ProductDetailAPIView.as_view()
 
 
 # class ProductListAPIView(generics.ListAPIView):
-#   qs = Product.objects.all()
+#   queryset = Product.objects.all()
 #   serializer_class = ProductSerializer
 
 # product_List_view = ProductListAPIView.as_view()
@@ -61,8 +63,8 @@ def product_alt_view(request, pk=None, *args, **kwargs):
         return Response(data)
     
     # list view
-    qs = Product.objects.all()
-    data = ProductSerializer(qs, many=True).data
+    queryset = Product.objects.all()
+    data = ProductSerializer(queryset, many=True).data
     return Response(data)
   if method == "POST":
     # create an item 

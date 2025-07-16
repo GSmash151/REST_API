@@ -1,13 +1,14 @@
+# drf/backend/products/urls.py
+
 from django.urls import path
 from . import views
 
 urlpatterns = [
- # path('', views.product_create_view),
-   path('', views.product_list_create_view),
-  # path('', views.product_alt_view),
-  # path('<int:pk>/', views.product_alt_view)
-   path('<int:pk>/', views.ProductDetailAPIView.as_view())
+    path("", views.product_detail_view),
+    path("<int:pk>/", views.product_detail_view),
+    # path('', views.product_create_view),
+    # path('', views.product_list_create_view),
+    # path('', views.product_alt_view),
+    # path("<int:pk>/", views.product_alt_view)
+    path("<int:pk>/", views.ProductDetailAPIView.as_view()),
 ]
-
-
-# (https://youtu.be/c708Nf0cHrs?t=6914)

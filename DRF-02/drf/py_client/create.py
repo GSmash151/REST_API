@@ -1,3 +1,5 @@
+# drf/py_client/create.py 
+
 import requests
 
 endpoint = "http://localhost:8000/api/products/"
