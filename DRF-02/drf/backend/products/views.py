@@ -1,7 +1,7 @@
 # drf/backend/products/views.py
 
 from rest_framework import status
-from rest_framework import generics, mixins
+from rest_framework import authentication, generics, mixins, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # from django.http import Http404
@@ -11,11 +11,13 @@ from .models import Product
 from .serializer import ProductSerializer
 
 
-
 """ListCreateAPIView"""
 class ProductListCreateAPIView(generics.ListCreateAPIView):
   queryset = Product.objects.all()
   serializer_class = ProductSerializer
+  authentication_classes = [authentication.SessionAuthentication ]
+  permission_classes = [permissions.IsAuthenticated]
+  # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
   def perform_create(self, serializer):
     print(serializer.validated_data)
@@ -116,7 +118,6 @@ def product_alt_view(request, pk=None, *args, **kwargs):
   return RecursionError({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 """ Mixins"""
 class ProductMixinView(
   mixins.DestroyModelMixin,
@@ -125,63 +126,46 @@ class ProductMixinView(
   mixins.RetrieveModelMixin,
   generics.GenericAPIView
 ):
-  queryset = Product.objects.all()
-  serializer_class = ProductSerializer
-  lookup_field = 'pk'
-  
-  def get(
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'pk'
+
+    def get(
       self, 
       request, 
       *args, 
       **kwargs
     ):
-    print(args, kwargs)
-    pk = kwargs.get('pk')
-    if pk is not None:
-      return self.retrieve(request, *args, **kwargs)
-    return self.list(request, *args, **kwargs)
+        print(args, kwargs)
+        pk = kwargs.get('pk')
+        if pk is not None:
+            return self.retrieve(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
 
-  def post(
+    def post(
     self,
     request, 
     *args, 
     **kwargs
   ):  
-  
-    return self.create(request, *args, **kwargs)
 
-  def perform_create(self, serializer):
-    print(serializer.validated_data)
-    title = serializer.validated_data.get('title')    
-    content = serializer.validated_data.get('content') or title
-    if content is None:
-      content = "I'm doing cool stuff"  
-    serializer.save(content=content)
+        return self.create(request, *args, **kwargs)
 
-  def delete(self, request, *args, **kwargs):
-    return self.destroy(request, *args, **kwargs)
-  
+    def perform_create(self, serializer):
+        print(serializer.validated_data)
+        title = serializer.validated_data.get("title")
+        content = serializer.validated_data.get("content") or title
+        if content is None:
+            content = "I'm doing cool stuff"
+        serializer.save(content=content)
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+
 product_mixin_view = ProductMixinView.as_view()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
