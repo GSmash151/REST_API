@@ -7,25 +7,28 @@ from rest_framework.response import Response
 # from django.http import Http404
 from django.shortcuts import get_object_or_404
 
+from .permissions import IsStaffEditorPermission
 from .models import Product
 from .serializer import ProductSerializer
 
 
 """ListCreateAPIView"""
 class ProductListCreateAPIView(generics.ListCreateAPIView):
-  queryset = Product.objects.all()
-  serializer_class = ProductSerializer
-  authentication_classes = [authentication.SessionAuthentication ]
-  permission_classes = [permissions.IsAuthenticated]
-  # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
+    # permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.DjangoModelPermissions]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-  def perform_create(self, serializer):
-    print(serializer.validated_data)
-    title = serializer.validated_data.get('title')    
-    content = serializer.validated_data.get('content') or title
-    if content is None:
-      content = title   
-    serializer.save(content=content)
+    def perform_create(self, serializer):
+        print(serializer.validated_data)
+        title = serializer.validated_data.get('title')    
+        content = serializer.validated_data.get('content') or title
+        if content is None:
+            content = title   
+        serializer.save(content=content)
 
 product_list_create_view = ProductListCreateAPIView.as_view()
 
@@ -56,15 +59,15 @@ product_detail_view = ProductDetailAPIView.as_view()
 
 """UpdateAPIView"""
 class ProductUpdateAPIView(generics.UpdateAPIView):
-  queryset = Product.objects.all()
-  serializer_class = ProductSerializer
-  lookup_field = 'pk'
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = "pk"
 
-  def perform_update(self, serializer):
-    instance = serializer.save()
-    if not instance.content:
-      instance.content = instance.title
-      instance.save()
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        if not instance.content:
+            instance.content = instance.title
+            instance.save()
 
 product_update_view = ProductUpdateAPIView.as_view()
 
